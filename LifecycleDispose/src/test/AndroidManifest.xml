@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.wada811.lifecycledispose">
+
+    <application>
+        <activity android:name=".infra.TestActivity" />
+    </application>
+</manifest>

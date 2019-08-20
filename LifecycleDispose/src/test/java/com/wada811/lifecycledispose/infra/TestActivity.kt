@@ -1,11 +1,11 @@
-package com.wada811.lifecycledisposable.infra
+package com.wada811.lifecycledispose.infra
 
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
-import com.wada811.lifecycledisposable.disposeOnLifecycle
+import com.wada811.lifecycledispose.disposeOnLifecycle
 import io.reactivex.Observable
-import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeUnit
 
 class TestActivity : FragmentActivity() {
     internal var onCreateDoOnDispose: () -> Unit = {}
@@ -29,7 +29,7 @@ class TestActivity : FragmentActivity() {
                 .commit()
         }
 
-        Observable.interval(1, SECONDS)
+        Observable.interval(1, TimeUnit.SECONDS)
             .doOnSubscribe { Log.d(this.javaClass.simpleName, "onCreate : ${lifecycleState()} on Subscribe") }
             .doOnDispose { Log.d(this.javaClass.simpleName, "onCreate : ${lifecycleState()} on Dispose") }
             .doOnDispose { onCreateDoOnDispose() }
@@ -44,7 +44,7 @@ class TestActivity : FragmentActivity() {
 
     override fun onStart() {
         super.onStart()
-        Observable.interval(1, SECONDS)
+        Observable.interval(1, TimeUnit.SECONDS)
             .doOnSubscribe { Log.d(this.javaClass.simpleName, "onStart  : ${lifecycleState()} on Subscribe") }
             .doOnDispose { Log.d(this.javaClass.simpleName, "onStart  : ${lifecycleState()} on Dispose") }
             .doOnDispose { onStartDoOnDispose() }
@@ -54,7 +54,7 @@ class TestActivity : FragmentActivity() {
 
     override fun onResume() {
         super.onResume()
-        Observable.interval(1, SECONDS)
+        Observable.interval(1, TimeUnit.SECONDS)
             .doOnSubscribe { Log.d(this.javaClass.simpleName, "onResume : ${lifecycleState()} on Subscribe") }
             .doOnDispose { Log.d(this.javaClass.simpleName, "onResume : ${lifecycleState()} on Dispose") }
             .doOnDispose { onResumeDoOnDispose() }
@@ -69,7 +69,7 @@ class TestActivity : FragmentActivity() {
 
     override fun onPause() {
         super.onPause()
-        Observable.interval(1, SECONDS)
+        Observable.interval(1, TimeUnit.SECONDS)
             .doOnSubscribe { Log.d(this.javaClass.simpleName, "onPause  : ${lifecycleState()} on Subscribe") }
             .doOnDispose { Log.d(this.javaClass.simpleName, "onPause  : ${lifecycleState()} on Dispose") }
             .doOnDispose { onPauseDoOnDispose() }
@@ -79,7 +79,7 @@ class TestActivity : FragmentActivity() {
 
     override fun onStop() {
         super.onStop()
-        Observable.interval(1, SECONDS)
+        Observable.interval(1, TimeUnit.SECONDS)
             .doOnSubscribe { Log.d(this.javaClass.simpleName, "onStop   : ${lifecycleState()} on Subscribe") }
             .doOnDispose { Log.d(this.javaClass.simpleName, "onStop   : ${lifecycleState()} on Dispose") }
             .doOnDispose { onStopDoOnDispose() }
@@ -89,7 +89,7 @@ class TestActivity : FragmentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Observable.interval(1, SECONDS)
+        Observable.interval(1, TimeUnit.SECONDS)
             .doOnSubscribe { Log.d(this.javaClass.simpleName, "onDestroy: ${lifecycleState()} on Subscribe") }
             .doOnDispose { Log.d(this.javaClass.simpleName, "onDestroy: ${lifecycleState()} on Dispose") }
             .doOnDispose { onDestroyDoOnDispose() }

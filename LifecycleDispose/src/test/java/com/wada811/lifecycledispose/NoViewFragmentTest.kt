@@ -1,13 +1,12 @@
-package com.wada811.lifecycledisposable
+package com.wada811.lifecycledispose
 
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.wada811.lifecycledisposable.infra.TestViewFragment
+import com.wada811.lifecycledispose.infra.TestNoViewFragment
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
-
 
 /**
  * Test disposing on corresponding lifecycle event.
@@ -15,10 +14,10 @@ import org.junit.runner.RunWith
  * @see <a href="https://developer.android.com/topic/libraries/architecture/lifecycle#lc">Handling Lifecycles with Lifecycle-Aware Components | Android Developers</a>
  */
 @RunWith(AndroidJUnit4::class)
-class ViewFragmentTest {
+class NoViewFragmentTest {
     @Test
     fun onCreate() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
+        val scenario = FragmentScenario.launch(TestNoViewFragment::class.java)
         scenario.onFragment {
             it.onCreateDoOnDispose = {
                 Assert.assertEquals(Lifecycle.State.DESTROYED, it.lifecycle.currentState)
@@ -29,10 +28,10 @@ class ViewFragmentTest {
 
     @Test
     fun onCreateView() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
+        val scenario = FragmentScenario.launch(TestNoViewFragment::class.java)
         scenario.onFragment {
             it.onCreateViewDoOnDispose = {
-                Assert.assertEquals(Lifecycle.State.DESTROYED, it.viewLifecycleOwner.lifecycle.currentState)
+                Assert.assertEquals(Lifecycle.State.CREATED, it.lifecycle.currentState)
             }
         }
         scenario.moveToState(Lifecycle.State.DESTROYED)
@@ -40,21 +39,22 @@ class ViewFragmentTest {
 
     @Test
     fun onStart() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
+        val scenario = FragmentScenario.launch(TestNoViewFragment::class.java)
         scenario.onFragment {
             it.onStartDoOnDispose = {
-                Assert.assertEquals(Lifecycle.State.CREATED, it.viewLifecycleOwner.lifecycle.currentState)
+                Assert.assertEquals(Lifecycle.State.CREATED, it.lifecycle.currentState)
             }
         }
         scenario.moveToState(Lifecycle.State.DESTROYED)
+
     }
 
     @Test
     fun onResume() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
+        val scenario = FragmentScenario.launch(TestNoViewFragment::class.java)
         scenario.onFragment {
             it.onResumeDoOnDispose = {
-                Assert.assertEquals(Lifecycle.State.STARTED, it.viewLifecycleOwner.lifecycle.currentState)
+                Assert.assertEquals(Lifecycle.State.STARTED, it.lifecycle.currentState)
             }
         }
         scenario.moveToState(Lifecycle.State.DESTROYED)
@@ -62,10 +62,10 @@ class ViewFragmentTest {
 
     @Test
     fun onPause() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
+        val scenario = FragmentScenario.launch(TestNoViewFragment::class.java)
         scenario.onFragment {
             it.onPauseDoOnDispose = {
-                Assert.assertEquals(Lifecycle.State.DESTROYED, it.viewLifecycleOwner.lifecycle.currentState)
+                Assert.assertEquals(Lifecycle.State.DESTROYED, it.lifecycle.currentState)
             }
         }
         scenario.moveToState(Lifecycle.State.DESTROYED)
@@ -73,10 +73,10 @@ class ViewFragmentTest {
 
     @Test
     fun onStop() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
+        val scenario = FragmentScenario.launch(TestNoViewFragment::class.java)
         scenario.onFragment {
             it.onStopDoOnDispose = {
-                Assert.assertEquals(Lifecycle.State.DESTROYED, it.viewLifecycleOwner.lifecycle.currentState)
+                Assert.assertEquals(Lifecycle.State.DESTROYED, it.lifecycle.currentState)
             }
         }
         scenario.moveToState(Lifecycle.State.DESTROYED)
@@ -84,15 +84,10 @@ class ViewFragmentTest {
 
     @Test
     fun onDestroyView() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
+        val scenario = FragmentScenario.launch(TestNoViewFragment::class.java)
         scenario.onFragment {
             it.onDestroyViewDoOnDispose = {
-                try {
-                    Assert.assertEquals(Lifecycle.State.DESTROYED, it.viewLifecycleOwner.lifecycle.currentState)
-                } catch (e: Exception) {
-                    Assert.assertTrue(e is IllegalStateException)
-                    Assert.assertEquals("Can't access the Fragment View's LifecycleOwner when getView() is null i.e., before onCreateView() or after onDestroyView()", e.message)
-                }
+                Assert.assertEquals(Lifecycle.State.DESTROYED, it.lifecycle.currentState)
             }
         }
         scenario.moveToState(Lifecycle.State.DESTROYED)
@@ -100,7 +95,7 @@ class ViewFragmentTest {
 
     @Test
     fun onDestroy() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
+        val scenario = FragmentScenario.launch(TestNoViewFragment::class.java)
         scenario.onFragment {
             it.onDestroyDoOnDispose = {
                 Assert.assertEquals(Lifecycle.State.DESTROYED, it.lifecycle.currentState)

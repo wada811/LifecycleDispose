@@ -1,9 +1,9 @@
-package com.wada811.lifecycledisposable
+package com.wada811.lifecycledispose
 
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.wada811.lifecycledisposable.infra.TestActivity
+import com.wada811.lifecycledispose.infra.TestActivity
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
@@ -18,7 +18,7 @@ import org.junit.runner.RunWith
 class ActivityTest {
 
     @get:Rule
-    val rule: ActivityScenarioRule<TestActivity> = ActivityScenarioRule<TestActivity>(TestActivity::class.java)
+    val rule: ActivityScenarioRule<TestActivity> = ActivityScenarioRule(TestActivity::class.java)
 
     @Test
     fun onCreate() {
