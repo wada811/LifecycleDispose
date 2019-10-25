@@ -1,5 +1,6 @@
 package com.wada811.lifecycledispose
 
+import android.os.Build
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -7,6 +8,7 @@ import com.wada811.lifecycledispose.infra.TestViewFragment
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
 
 /**
@@ -14,6 +16,7 @@ import org.junit.runner.RunWith
  *
  * @see <a href="https://developer.android.com/topic/libraries/architecture/lifecycle#lc">Handling Lifecycles with Lifecycle-Aware Components | Android Developers</a>
  */
+@Config(sdk = [Build.VERSION_CODES.P])
 @RunWith(AndroidJUnit4::class)
 class ViewFragmentTest {
     @Test
@@ -21,7 +24,7 @@ class ViewFragmentTest {
         val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
         scenario.onFragment {
             it.onCreateDoOnDispose = {
-                Assert.assertEquals(Lifecycle.State.DESTROYED, it.lifecycle.currentState)
+                Assert.assertEquals(Lifecycle.State.DESTROYED, it.viewLifecycleOwner.lifecycle.currentState)
             }
         }
         scenario.moveToState(Lifecycle.State.DESTROYED)
@@ -35,7 +38,7 @@ class ViewFragmentTest {
                 Assert.assertEquals(Lifecycle.State.DESTROYED, it.viewLifecycleOwner.lifecycle.currentState)
             }
         }
-//        scenario.moveToState(Lifecycle.State.DESTROYED)
+        scenario.moveToState(Lifecycle.State.DESTROYED)
     }
 
     @Test

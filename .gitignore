@@ -1,7 +1,6 @@
 .gradle/
 .idea/*
 !.idea/codeStyle
-!.idea/dictionaries
 build/
 *.iml
 local.properties

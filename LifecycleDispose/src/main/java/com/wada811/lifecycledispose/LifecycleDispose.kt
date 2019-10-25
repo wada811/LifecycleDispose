@@ -15,9 +15,8 @@ import androidx.lifecycle.Lifecycle.State.DESTROYED
 import androidx.lifecycle.Lifecycle.State.INITIALIZED
 import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.lifecycle.Lifecycle.State.STARTED
-import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.OnLifecycleEvent
 import io.reactivex.disposables.Disposable
 
 /**
@@ -41,7 +40,7 @@ fun <TDisposable : Disposable> TDisposable.disposeOnLifecycle(activity: Fragment
             INITIALIZED -> ON_DESTROY // onCreate
             CREATED -> ON_STOP // onStart, onStop
             STARTED, RESUMED -> ON_PAUSE // onResume, onPause
-            else -> ON_DESTROY // onDestroy
+            DESTROYED -> ON_DESTROY // onDestroy
         })
     }
 
@@ -60,7 +59,7 @@ private fun <TDisposable : Disposable> TDisposable.disposeOnLifecycleEvent(activ
     this.also {
         when (activity.lifecycle.currentState) {
             DESTROYED -> dispose()
-            else -> disposeOnLifecycleEvents(activity.lifecycle, lifecycleEvent, ON_DESTROY)
+            else -> disposeOnLifecycleEvents(activity.lifecycle, listOf(lifecycleEvent, ON_DESTROY))
         }
     }
 
@@ -83,13 +82,7 @@ private fun <TDisposable : Disposable> TDisposable.disposeOnLifecycleEvent(activ
 @Keep
 fun <TDisposable : Disposable> TDisposable.disposeOnLifecycle(fragment: Fragment): TDisposable =
     this.also {
-        val lifecycle = if (fragment.isViewCreated()) fragment.viewLifecycleOwner.lifecycle else fragment.lifecycle
-        disposeOnLifecycleEvent(fragment, when (lifecycle.currentState) {
-            INITIALIZED -> ON_DESTROY // onCreate, onCreateView
-            CREATED -> ON_STOP // onStart, onStop
-            STARTED, RESUMED -> ON_PAUSE // onResume, onPause
-            else -> ON_DESTROY // onDestroyView, onDestroy
-        })
+        disposeOnLifecycleEvent(fragment)
     }
 
 @Keep
@@ -101,58 +94,65 @@ fun <TDisposable : Disposable> TDisposable.disposeOnPause(fragment: Fragment): T
 @Keep
 fun <TDisposable : Disposable> TDisposable.disposeOnDestroy(fragment: Fragment): TDisposable = disposeOnLifecycleEvent(fragment, ON_DESTROY)
 
-private fun <TDisposable : Disposable> TDisposable.disposeOnLifecycleEvent(fragment: Fragment, lifecycleEvent: Lifecycle.Event): TDisposable =
+private fun <TDisposable : Disposable> TDisposable.disposeOnLifecycleEvent(fragment: Fragment, lifecycleEvent: Lifecycle.Event? = null): TDisposable =
     this.also {
-        if (fragment.isViewCreated()) {
+        if (fragment.view != null) {
             val lifecycle = fragment.viewLifecycleOwner.lifecycle
             when (lifecycle.currentState) {
-                INITIALIZED -> throw IllegalStateException("Fragment's view should have created.")
-                // onStart, onStop
-                CREATED -> disposeOnLifecycleEvents(lifecycle, lifecycleEvent, ON_DESTROY)
-                // onResume, onPause
-                STARTED, RESUMED -> disposeOnLifecycleEvents(lifecycle, lifecycleEvent, ON_DESTROY)
-                // onDestroyView
-                else -> dispose()
+                // Called from onViewCreated, onActivityCreated, onViewStateRestored
+                INITIALIZED -> disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_DESTROY))
+                // Called from onStart, onStop
+                CREATED -> disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_STOP, ON_DESTROY))
+                // Called from onResume, onPause
+                STARTED, RESUMED -> disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_PAUSE, ON_DESTROY))
+                // Called from onDestroyView
+                else -> safeDispose()
             }
         } else {
             val lifecycle = fragment.lifecycle
             when (lifecycle.currentState) {
-                INITIALIZED -> disposeOnLifecycleEvents(lifecycle, ON_DESTROY)
+                INITIALIZED -> doOnLifecycleEvents(lifecycle, {
+                    // Called from onAttach, onCreate
+                    if (fragment.view != null) {
+                        disposeOnLifecycleEvents(fragment.viewLifecycleOwner.lifecycle, listOfNotNull(lifecycleEvent, ON_DESTROY))
+                    } else {
+                        disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_DESTROY))
+                    }
+                }, listOf(ON_START))
                 CREATED -> doOnLifecycleEvents(lifecycle, { event ->
                     // Evaluate which Fragment has view after onCreateView.
                     if (event == ON_START) {
-                        if (fragment.isViewCreated()) {
-                            // onCreateView, onViewCreated, onActivityCreated
-                            disposeOnLifecycleEvent(fragment, lifecycleEvent)
+                        if (fragment.view != null) {
+                            // Called from onCreateView
+                            disposeOnLifecycleEvents(fragment.viewLifecycleOwner.lifecycle, listOfNotNull(lifecycleEvent, ON_DESTROY))
                         } else {
-                            // onStart
-                            disposeOnLifecycleEvent(fragment, lifecycleEvent)
+                            // Called from onActivityCreated, onStart
+                            disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_STOP, ON_DESTROY))
                         }
-                    } else if (event == lifecycleEvent || event == ON_DESTROY) {
-                        // onStop
-                        dispose()
+                    } else if (event == ON_DESTROY) {
+                        // Called from onStop
+                        safeDispose()
                     }
-                }, ON_START, lifecycleEvent, ON_DESTROY)
-                // onResume, onPause
-                STARTED, RESUMED -> disposeOnLifecycleEvents(lifecycle, lifecycleEvent, ON_DESTROY)
-                // onDestroy
-                else -> dispose()
+                }, listOf(ON_START, ON_DESTROY))
+                // Called from onResume, onPause
+                STARTED, RESUMED -> disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_PAUSE, ON_DESTROY))
+                // Called from onDestroy
+                else -> safeDispose()
             }
         }
     }
 
-private fun Disposable.disposeOnLifecycleEvents(lifecycle: Lifecycle, vararg lifecycleEvents: Lifecycle.Event) {
-    doOnLifecycleEvents(lifecycle, { dispose() }, *lifecycleEvents)
+private fun Disposable.disposeOnLifecycleEvents(lifecycle: Lifecycle, lifecycleEvents: List<Lifecycle.Event>) {
+    doOnLifecycleEvents(lifecycle, { safeDispose() }, lifecycleEvents)
 }
 
 private fun Disposable.doOnLifecycleEvents(
     lifecycle: Lifecycle,
     onEvent: Disposable.(Lifecycle.Event) -> Unit,
-    vararg lifecycleEvents: Lifecycle.Event
+    lifecycleEvents: List<Lifecycle.Event>
 ) {
-    lifecycle.addObserver(object : LifecycleObserver {
-        @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
-        fun onLifecycleEvent(@Suppress("UNUSED_PARAMETER") source: LifecycleOwner, event: Lifecycle.Event) {
+    lifecycle.addObserver(object : LifecycleEventObserver {
+        override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
             if (event in lifecycleEvents) {
                 lifecycle.removeObserver(this)
                 onEvent(event)
@@ -161,10 +161,9 @@ private fun Disposable.doOnLifecycleEvents(
     })
 }
 
-private fun Fragment.isViewCreated(): Boolean {
-    return try {
-        this.view != null && this.viewLifecycleOwner.lifecycle.currentState.isAtLeast(CREATED)
-    } catch (e: Exception) {
-        false
+private fun Disposable.safeDispose() {
+    if (!isDisposed) {
+        dispose()
     }
 }
+

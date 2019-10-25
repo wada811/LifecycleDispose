@@ -62,11 +62,12 @@ Observable.interval(1, TimeUnit.SECONDS)
 
 ### Fragment
 
+#### Fragment has a view
 **Table 2** Corresponding between Fragment's lifecycle state and Lifecycle down event.
 
 | Subscribe     | Lifecycle.State | Lifecycle.Event | Dispose       |
 | ------------- | --------------- | --------------- | ------------- |
-| onCreate      | INITIALIZED     | ON_DESTROY      | onDestroy     |
+| onCreate      | INITIALIZED     | ON_DESTROY      | onDestroyView |
 | onCreateView  | INITIALIZED     | ON_DESTROY      | onDestroyView |
 | onStart       | CREATED         | ON_STOP         | onStop        |
 | onResume      | STARTED         | ON_PAUSE        | onPause       |
@@ -75,14 +76,27 @@ Observable.interval(1, TimeUnit.SECONDS)
 | onDestroyView | DESTROYED       | ON_DESTROY      | onDestroyView |
 | onDestroy     | DESTROYED       | ON_DESTROY      | onDestroy     |
 
- 
+#### Fragment has no view
+
+**Table 3** Corresponding between Fragment's lifecycle state and Lifecycle down event.
+
+| Subscribe     | Lifecycle.State | Lifecycle.Event | Dispose       |
+| ------------- | --------------- | --------------- | ------------- |
+| onCreate      | INITIALIZED     | ON_DESTROY      | onDestroy     |
+| onStart       | CREATED         | ON_STOP         | onStop        |
+| onResume      | STARTED         | ON_PAUSE        | onPause       |
+| onPause       | STARTED         | ON_DESTROY      | onDestroy     |
+| onStop        | CREATED         | ON_DESTROY      | onDestroy     |
+| onDestroy     | DESTROYED       | ON_DESTROY      | onDestroy     |
+
+
 ## Gradle
 
 [![](https://jitpack.io/v/wada811/LifecycleDispose.svg)](https://jitpack.io/#wada811/LifecycleDispose)
 
 ```groovy
 repositories {
-    maven { url "https://jitpack.io" }
+    maven { url "https://www.jitpack.io" }
 }
 
 dependencies {

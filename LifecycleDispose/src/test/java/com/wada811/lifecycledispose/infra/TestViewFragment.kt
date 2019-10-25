@@ -39,8 +39,8 @@ class TestViewFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Observable.interval(1, TimeUnit.SECONDS)
-            .doOnSubscribe { Log.d(this.javaClass.simpleName, "onCreate     : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
-            .doOnDispose { Log.d(this.javaClass.simpleName, "onCreate     : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
+            .doOnSubscribe { println("${this.javaClass.simpleName}, onCreate     : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
+            .doOnDispose { println("${this.javaClass.simpleName}, onCreate     : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
             .doOnDispose { onCreateDoOnDispose() }
             .subscribe()
             .disposeOnLifecycle(this)
@@ -48,8 +48,8 @@ class TestViewFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Observable.interval(1, TimeUnit.SECONDS)
-            .doOnSubscribe { Log.d(this.javaClass.simpleName, "onCreateView : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
-            .doOnDispose { Log.d(this.javaClass.simpleName, "onCreateView : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
+            .doOnSubscribe { println("${this.javaClass.simpleName}, onCreateView : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
+            .doOnDispose { println("${this.javaClass.simpleName}, onCreateView : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
             .doOnDispose { onCreateViewDoOnDispose() }
             .subscribe()
             .disposeOnLifecycle(this)
@@ -69,8 +69,8 @@ class TestViewFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         Observable.interval(1, TimeUnit.SECONDS)
-            .doOnSubscribe { Log.d(this.javaClass.simpleName, "onStart      : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
-            .doOnDispose { Log.d(this.javaClass.simpleName, "onStart      : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
+            .doOnSubscribe { println("${this.javaClass.simpleName}, onStart      : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
+            .doOnDispose { println("${this.javaClass.simpleName}, onStart      : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
             .doOnDispose { onStartDoOnDispose() }
             .subscribe()
             .disposeOnLifecycle(this)
@@ -79,8 +79,8 @@ class TestViewFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         Observable.interval(1, TimeUnit.SECONDS)
-            .doOnSubscribe { Log.d(this.javaClass.simpleName, "onResume     : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
-            .doOnDispose { Log.d(this.javaClass.simpleName, "onResume     : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
+            .doOnSubscribe { println("${this.javaClass.simpleName}, onResume     : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
+            .doOnDispose { println("${this.javaClass.simpleName}, onResume     : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
             .doOnDispose { onResumeDoOnDispose() }
             .subscribe()
             .disposeOnLifecycle(this)
@@ -89,8 +89,8 @@ class TestViewFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         Observable.interval(1, TimeUnit.SECONDS)
-            .doOnSubscribe { Log.d(this.javaClass.simpleName, "onPause      : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
-            .doOnDispose { Log.d(this.javaClass.simpleName, "onPause      : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
+            .doOnSubscribe { println("${this.javaClass.simpleName}, onPause      : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
+            .doOnDispose { println("${this.javaClass.simpleName}, onPause      : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
             .doOnDispose { onPauseDoOnDispose() }
             .subscribe()
             .disposeOnLifecycle(this)
@@ -99,8 +99,8 @@ class TestViewFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         Observable.interval(1, TimeUnit.SECONDS)
-            .doOnSubscribe { Log.d(this.javaClass.simpleName, "onStop       : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
-            .doOnDispose { Log.d(this.javaClass.simpleName, "onStop       : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
+            .doOnSubscribe { println("${this.javaClass.simpleName}, onStop       : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
+            .doOnDispose { println("${this.javaClass.simpleName}, onStop       : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
             .doOnDispose { onStopDoOnDispose() }
             .subscribe()
             .disposeOnLifecycle(this)
@@ -109,8 +109,8 @@ class TestViewFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         Observable.interval(1, TimeUnit.SECONDS)
-            .doOnSubscribe { Log.d(this.javaClass.simpleName, "onDestroyView: Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
-            .doOnDispose { Log.d(this.javaClass.simpleName, "onDestroyView: Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
+            .doOnSubscribe { println("${this.javaClass.simpleName}, onDestroyView: Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
+            .doOnDispose { println("${this.javaClass.simpleName}, onDestroyView: Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
             .doOnDispose { onDestroyViewDoOnDispose() }
             .subscribe()
             .disposeOnLifecycle(this)
@@ -119,8 +119,8 @@ class TestViewFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         Observable.interval(1, TimeUnit.SECONDS)
-            .doOnSubscribe { Log.d(this.javaClass.simpleName, "onDestroy    : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
-            .doOnDispose { Log.d(this.javaClass.simpleName, "onDestroy    : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
+            .doOnSubscribe { println("${this.javaClass.simpleName}, onDestroy    : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Subscribe") }
+            .doOnDispose { println("${this.javaClass.simpleName}, onDestroy    : Lifecycle: ${lifecycleState()}, ViewLifecycle: ${viewLifecycleState()} on Dispose") }
             .doOnDispose { onDestroyDoOnDispose() }
             .subscribe()
             .disposeOnLifecycle(this)
