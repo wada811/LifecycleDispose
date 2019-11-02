@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.wada811.lifecycledispose">
+    package="com.wada811.lifecycledispose.test">
 
     <application>
-        <activity android:name=".infra.TestActivity" />
+        <activity android:name=".TestActivity" />
     </application>
 </manifest>

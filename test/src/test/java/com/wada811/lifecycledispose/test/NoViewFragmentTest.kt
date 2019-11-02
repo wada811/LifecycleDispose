@@ -1,10 +1,9 @@
-package com.wada811.lifecycledispose
+package com.wada811.lifecycledispose.test
 
 import android.os.Build
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.wada811.lifecycledispose.infra.TestNoViewFragment
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith

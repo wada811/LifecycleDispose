@@ -1,1 +1,1 @@
-include ':LifecycleDispose'
+include ':LifecycleDispose', ':test'

@@ -1,10 +1,9 @@
-package com.wada811.lifecycledispose
+package com.wada811.lifecycledispose.test
 
 import android.os.Build
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.wada811.lifecycledispose.infra.TestActivity
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test

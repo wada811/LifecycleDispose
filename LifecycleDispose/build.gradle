@@ -1,48 +1,23 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply from: "$rootDir/gradle-use-latest-versions.gradle"
+apply from: "$rootDir/gradle-maven-publish.gradle"
 
 android {
     compileSdkVersion 29
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0.0"
-        multiDexEnabled true
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-    }
-    testOptions {
-        unitTests.includeAndroidResources = true
     }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
-    implementation "io.reactivex.rxjava2:rxjava:2.2.11"
-    implementation "androidx.fragment:fragment:1.2.0-beta02"
-
-    testImplementation 'androidx.fragment:fragment-testing:1.2.0-beta02'
-
-    testImplementation 'junit:junit:4.12'
-
-    // Core library
-    testImplementation 'androidx.test:core:1.2.0'
-    testImplementation 'androidx.test:core-ktx:1.2.0'
-
-    // AndroidJUnitRunner, JUnit Rules and RobolectricRunner
-    testImplementation 'androidx.test:runner:1.2.0'
-    testImplementation 'androidx.test:rules:1.2.0'
-    testImplementation 'org.robolectric:robolectric:4.3'
-
-    // Assertions
-    testImplementation 'androidx.test.ext:junit:1.1.1'
-    testImplementation 'androidx.test.ext:junit-ktx:1.1.1'
-    testImplementation 'androidx.test.ext:truth:1.2.0'
-    testImplementation 'com.google.truth:truth:1.0'
+    implementation "io.reactivex.rxjava2:rxjava:2.2.13"
+    implementation "androidx.fragment:fragment:1.2.0-rc01"
 }

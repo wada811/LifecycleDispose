@@ -96,11 +96,11 @@ Observable.interval(1, TimeUnit.SECONDS)
 
 ```groovy
 repositories {
-    maven { url "https://www.jitpack.io" }
+    maven { url "https://maven.pkg.github.com/wada811/LifecycleDispose" }
 }
 
 dependencies {
-    implementation 'com.github.wada811:LifecycleDispose:x.y.z'
+    implementation 'com.wada811.lifecycledispose:lifecycledispose:x.y.z'
 }
 ```
 

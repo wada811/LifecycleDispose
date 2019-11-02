@@ -1,4 +1,4 @@
-package com.wada811.lifecycledispose.infra
+package com.wada811.lifecycledispose.test
 
 import android.os.Bundle
 import android.util.Log
