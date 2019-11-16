@@ -1,7 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply from: "$rootDir/gradle-use-latest-versions.gradle"
-apply from: "$rootDir/gradle-maven-publish.gradle"
 
 android {
     compileSdkVersion 29
