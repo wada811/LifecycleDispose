@@ -94,8 +94,6 @@ Observable.interval(1, TimeUnit.SECONDS)
 
 [![](https://jitpack.io/v/wada811/LifecycleDispose.svg)](https://jitpack.io/#wada811/LifecycleDispose)
 
-### JitPack
-
 ```groovy
 repositories {
     maven { url "https://www.jitpack.io" }
@@ -105,10 +103,6 @@ dependencies {
     implementation 'com.github.wada811:LifecycleDispose:x.y.z'
 }
 ```
-
-### GitHub Package Registry
-
-[See here](https://github.com/wada811/LifecycleDispose/packages/48090)
 
 ## License
 
