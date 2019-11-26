@@ -1,8 +1,6 @@
 LifecycleDispose
 =====
 
-[![Build Status](https://app.bitrise.io/app/25a74c8a899d5c9a/status.svg?token=rSUoGqwaasQ6M5a7KKPTdA&branch=master)](https://app.bitrise.io/app/25a74c8a899d5c9a)
-
 `LifecycleDispose` dispose RxJava streams on lifecycle down event that corresponding to Activity/Fragment's lifecycle state when subscribe using [Android Architecture Components Lifecycle](https://developer.android.com/topic/libraries/architecture/lifecycle).
 
 ![Lifecycle State](https://developer.android.com/images/topic/libraries/architecture/lifecycle-states.svg)
