@@ -64,8 +64,8 @@ Observable.interval(1, TimeUnit.SECONDS)
 
  | Subscribe     | ViewLifecycle.State   | Dispose       | Lifecycle.State | Dispose       |
  | ------------- | --------------------- | ------------- | --------------- | ------------- |
- | onAttach      | IllegalStateException | onDestroyView | INITIALIZED     | onDestroy     |
- | onCreate      | IllegalStateException | onDestroyView | INITIALIZED     | onDestroy     |
+ | onAttach      | IllegalStateException | onDestroy     | INITIALIZED     | onDestroy     |
+ | onCreate      | IllegalStateException | onDestroy     | INITIALIZED     | onDestroy     |
  | onCreateView  | IllegalStateException | onDestroyView | CREATED         | onDestroy     |
  | onViewCreated | INITIALIZED           | onDestroyView | not called      | not called    |
  | onStart       | CREATED               | onStop        | CREATED         | onStop        |
