@@ -17,13 +17,18 @@ android {
     }
 }
 
+repositories {
+    maven { url "https://www.jitpack.io" }
+}
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation project(":LifecycleDispose")
+//    implementation 'com.github.wada811:LifecycleDispose:2.0.3'
     implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
     implementation "io.reactivex.rxjava2:rxjava:2.2.14"
-    implementation "androidx.fragment:fragment:1.2.0-rc01"
-    testImplementation 'androidx.fragment:fragment-testing:1.2.0-rc01'
+    implementation "androidx.fragment:fragment:1.2.0-rc04"
+    implementation 'androidx.fragment:fragment-testing:1.2.0-rc04'
 
     testImplementation 'junit:junit:4.12'
 

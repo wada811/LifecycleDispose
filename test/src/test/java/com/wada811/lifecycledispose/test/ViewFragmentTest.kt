@@ -3,12 +3,24 @@ package com.wada811.lifecycledispose.test
 import android.os.Build
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.lifecycle.Lifecycle
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Assert
+import androidx.lifecycle.Lifecycle.State.CREATED
+import androidx.lifecycle.Lifecycle.State.DESTROYED
+import androidx.lifecycle.Lifecycle.State.STARTED
+import com.google.common.truth.Truth
+import com.wada811.lifecycledispose.test.FragmentLifecycleEvent.OnAttach
+import com.wada811.lifecycledispose.test.FragmentLifecycleEvent.OnCreate
+import com.wada811.lifecycledispose.test.FragmentLifecycleEvent.OnCreateView
+import com.wada811.lifecycledispose.test.FragmentLifecycleEvent.OnDestroy
+import com.wada811.lifecycledispose.test.FragmentLifecycleEvent.OnDestroyView
+import com.wada811.lifecycledispose.test.FragmentLifecycleEvent.OnPause
+import com.wada811.lifecycledispose.test.FragmentLifecycleEvent.OnResume
+import com.wada811.lifecycledispose.test.FragmentLifecycleEvent.OnStart
+import com.wada811.lifecycledispose.test.FragmentLifecycleEvent.OnStop
+import com.wada811.lifecycledispose.test.FragmentLifecycleEvent.OnViewCreated
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
-
 
 /**
  * Test disposing on corresponding lifecycle event.
@@ -16,98 +28,79 @@ import org.robolectric.annotation.Config
  * @see <a href="https://developer.android.com/topic/libraries/architecture/lifecycle#lc">Handling Lifecycles with Lifecycle-Aware Components | Android Developers</a>
  */
 @Config(sdk = [Build.VERSION_CODES.P])
-@RunWith(AndroidJUnit4::class)
-class ViewFragmentTest {
+@RunWith(ParameterizedRobolectricTestRunner::class)
+class ViewFragmentTest(
+    private val disposeStrategy: DisposeStrategy,
+    private val subscribeLifecycleEvent: FragmentLifecycleEvent,
+    private val expectedLifecycleState: Lifecycle.State
+) {
     @Test
-    fun onCreate() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
-        scenario.onFragment {
-            it.onCreateDoOnDispose = {
-                Assert.assertEquals(Lifecycle.State.DESTROYED, it.viewLifecycleOwner.lifecycle.currentState)
-            }
-        }
-        scenario.moveToState(Lifecycle.State.DESTROYED)
+    fun test() {
+        var fragment: DisposeViewFragment? = null
+        val scenario = FragmentScenario.launch(
+            DisposeViewFragment::class.java,
+            DisposeViewFragment.createBundle(
+                disposeStrategy,
+                subscribeLifecycleEvent
+            )
+        )
+        scenario.onFragment { fragment = it }
+        scenario.moveToState(DESTROYED)
+        Truth.assertThat(fragment!!.disposedLifecycleState).isEqualTo(expectedLifecycleState)
+        fragment = null
     }
 
-    @Test
-    fun onCreateView() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
-        scenario.onFragment {
-            it.onCreateViewDoOnDispose = {
-                Assert.assertEquals(Lifecycle.State.DESTROYED, it.viewLifecycleOwner.lifecycle.currentState)
-            }
+    companion object {
+        @Suppress("unused")
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "Strategy: {0}, subscribe: {1}, dispose: {2}")
+        fun parameters(): Iterable<Array<Any>> {
+            val parameters = mutableListOf<Array<Any>>()
+            // OnLifecycle
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, OnAttach, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, OnCreate, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, OnCreateView, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, OnViewCreated, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, OnStart, CREATED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, OnResume, STARTED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, OnPause, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, OnStop, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, OnDestroyView, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, OnDestroy, DESTROYED))
+            // OnPause
+            parameters.add(arrayOf(DisposeStrategy.OnPause, OnAttach, STARTED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, OnCreate, STARTED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, OnCreateView, STARTED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, OnViewCreated, STARTED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, OnStart, STARTED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, OnResume, STARTED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, OnPause, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, OnStop, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, OnDestroyView, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, OnDestroy, DESTROYED))
+            // OnStop
+            parameters.add(arrayOf(DisposeStrategy.OnStop, OnAttach, CREATED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, OnCreate, CREATED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, OnCreateView, CREATED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, OnViewCreated, CREATED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, OnStart, CREATED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, OnResume, CREATED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, OnPause, CREATED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, OnStop, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, OnDestroyView, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, OnDestroy, DESTROYED))
+            // OnDestroy
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, OnAttach, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, OnCreate, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, OnCreateView, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, OnViewCreated, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, OnStart, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, OnResume, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, OnPause, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, OnStop, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, OnDestroyView, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, OnDestroy, DESTROYED))
+            return parameters
         }
-        scenario.moveToState(Lifecycle.State.DESTROYED)
-    }
-
-    @Test
-    fun onStart() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
-        scenario.onFragment {
-            it.onStartDoOnDispose = {
-                Assert.assertEquals(Lifecycle.State.CREATED, it.viewLifecycleOwner.lifecycle.currentState)
-            }
-        }
-        scenario.moveToState(Lifecycle.State.DESTROYED)
-    }
-
-    @Test
-    fun onResume() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
-        scenario.onFragment {
-            it.onResumeDoOnDispose = {
-                Assert.assertEquals(Lifecycle.State.STARTED, it.viewLifecycleOwner.lifecycle.currentState)
-            }
-        }
-        scenario.moveToState(Lifecycle.State.DESTROYED)
-    }
-
-    @Test
-    fun onPause() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
-        scenario.onFragment {
-            it.onPauseDoOnDispose = {
-                Assert.assertEquals(Lifecycle.State.DESTROYED, it.viewLifecycleOwner.lifecycle.currentState)
-            }
-        }
-        scenario.moveToState(Lifecycle.State.DESTROYED)
-    }
-
-    @Test
-    fun onStop() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
-        scenario.onFragment {
-            it.onStopDoOnDispose = {
-                Assert.assertEquals(Lifecycle.State.DESTROYED, it.viewLifecycleOwner.lifecycle.currentState)
-            }
-        }
-        scenario.moveToState(Lifecycle.State.DESTROYED)
-    }
-
-    @Test
-    fun onDestroyView() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
-        scenario.onFragment {
-            it.onDestroyViewDoOnDispose = {
-                try {
-                    Assert.assertEquals(Lifecycle.State.DESTROYED, it.viewLifecycleOwner.lifecycle.currentState)
-                } catch (e: Exception) {
-                    Assert.assertTrue(e is IllegalStateException)
-                    Assert.assertEquals("Can't access the Fragment View's LifecycleOwner when getView() is null i.e., before onCreateView() or after onDestroyView()", e.message)
-                }
-            }
-        }
-        scenario.moveToState(Lifecycle.State.DESTROYED)
-    }
-
-    @Test
-    fun onDestroy() {
-        val scenario = FragmentScenario.launchInContainer(TestViewFragment::class.java)
-        scenario.onFragment {
-            it.onDestroyDoOnDispose = {
-                Assert.assertEquals(Lifecycle.State.DESTROYED, it.lifecycle.currentState)
-            }
-        }
-        scenario.moveToState(Lifecycle.State.DESTROYED)
     }
 }

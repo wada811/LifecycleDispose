@@ -2,6 +2,15 @@
     package="com.wada811.lifecycledispose.test">
 
     <application>
-        <activity android:name=".TestActivity" />
+        <activity android:name=".DisposeActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.wada811.lifecycledispose.test.ACTION_TEST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

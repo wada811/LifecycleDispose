@@ -60,33 +60,20 @@ Observable.interval(1, TimeUnit.SECONDS)
 
 ### Fragment
 
-#### Fragment has a view
 **Table 2** Corresponding between Fragment's lifecycle state and Lifecycle down event.
 
-| Subscribe     | Lifecycle.State | Lifecycle.Event | Dispose       |
-| ------------- | --------------- | --------------- | ------------- |
-| onCreate      | INITIALIZED     | ON_DESTROY      | onDestroyView |
-| onCreateView  | INITIALIZED     | ON_DESTROY      | onDestroyView |
-| onStart       | CREATED         | ON_STOP         | onStop        |
-| onResume      | STARTED         | ON_PAUSE        | onPause       |
-| onPause       | STARTED         | ON_DESTROY      | onDestroyView |
-| onStop        | CREATED         | ON_DESTROY      | onDestroyView |
-| onDestroyView | DESTROYED       | ON_DESTROY      | onDestroyView |
-| onDestroy     | DESTROYED       | ON_DESTROY      | onDestroy     |
-
-#### Fragment has no view
-
-**Table 3** Corresponding between Fragment's lifecycle state and Lifecycle down event.
-
-| Subscribe     | Lifecycle.State | Lifecycle.Event | Dispose       |
-| ------------- | --------------- | --------------- | ------------- |
-| onCreate      | INITIALIZED     | ON_DESTROY      | onDestroy     |
-| onStart       | CREATED         | ON_STOP         | onStop        |
-| onResume      | STARTED         | ON_PAUSE        | onPause       |
-| onPause       | STARTED         | ON_DESTROY      | onDestroy     |
-| onStop        | CREATED         | ON_DESTROY      | onDestroy     |
-| onDestroy     | DESTROYED       | ON_DESTROY      | onDestroy     |
-
+ | Subscribe     | ViewLifecycle.State   | Dispose       | Lifecycle.State | Dispose       |
+ | ------------- | --------------------- | ------------- | --------------- | ------------- |
+ | onAttach      | IllegalStateException | onDestroyView | INITIALIZED     | onDestroy     |
+ | onCreate      | IllegalStateException | onDestroyView | INITIALIZED     | onDestroy     |
+ | onCreateView  | IllegalStateException | onDestroyView | CREATED         | onDestroy     |
+ | onViewCreated | INITIALIZED           | onDestroyView | not called      | not called    |
+ | onStart       | CREATED               | onStop        | CREATED         | onStop        |
+ | onResume      | STARTED               | onPause       | STARTED         | onPause       |
+ | onPause       | STARTED               | onDestroyView | STARTED         | onDestroy     |
+ | onStop        | CREATED               | onDestroyView | CREATED         | onDestroy     |
+ | onDestroyView | DESTROYED             | onDestroyView | not called      | not called    |
+ | onDestroy     | IllegalStateException | onDestroy     | DESTROYED       | onDestroy     |
 
 ## Gradle
 

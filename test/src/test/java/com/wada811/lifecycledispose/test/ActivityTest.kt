@@ -2,12 +2,20 @@ package com.wada811.lifecycledispose.test
 
 import android.os.Build
 import androidx.lifecycle.Lifecycle
-import androidx.test.ext.junit.rules.ActivityScenarioRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Assert
-import org.junit.Rule
+import androidx.lifecycle.Lifecycle.Event.ON_CREATE
+import androidx.lifecycle.Lifecycle.Event.ON_DESTROY
+import androidx.lifecycle.Lifecycle.Event.ON_PAUSE
+import androidx.lifecycle.Lifecycle.Event.ON_RESUME
+import androidx.lifecycle.Lifecycle.Event.ON_START
+import androidx.lifecycle.Lifecycle.Event.ON_STOP
+import androidx.lifecycle.Lifecycle.State.CREATED
+import androidx.lifecycle.Lifecycle.State.DESTROYED
+import androidx.lifecycle.Lifecycle.State.STARTED
+import androidx.test.core.app.ActivityScenario
+import com.google.common.truth.Truth
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
@@ -16,75 +24,63 @@ import org.robolectric.annotation.Config
  * @see <a href="https://developer.android.com/topic/libraries/architecture/lifecycle#lc">Handling Lifecycles with Lifecycle-Aware Components | Android Developers</a>
  */
 @Config(sdk = [Build.VERSION_CODES.P])
-@RunWith(AndroidJUnit4::class)
-class ActivityTest {
-
-    @get:Rule
-    val rule: ActivityScenarioRule<TestActivity> = ActivityScenarioRule(TestActivity::class.java)
+@RunWith(ParameterizedRobolectricTestRunner::class)
+class ActivityTest(
+    private val disposeStrategy: DisposeStrategy,
+    private val subscribeLifecycleEvent: Lifecycle.Event,
+    private val expectedLifecycleState: Lifecycle.State
+) {
 
     @Test
-    fun onCreate() {
-        rule.scenario.use { scenario ->
-            scenario.onActivity { activity ->
-                activity.onCreateDoOnDispose = {
-                    Assert.assertEquals(Lifecycle.State.DESTROYED, activity.lifecycle.currentState)
-                }
-            }
+    fun test() {
+        var activity: DisposeActivity? = null
+        ActivityScenario.launch<DisposeActivity>(DisposeActivity.createIntent(
+            disposeStrategy,
+            subscribeLifecycleEvent
+        )).use { scenario ->
+            scenario.onActivity { activity = it }
+            scenario.moveToState(DESTROYED)
+            Truth.assertThat(activity!!.disposedLifecycleState).isEqualTo(expectedLifecycleState)
+            activity = null
         }
     }
 
-    @Test
-    fun onStart() {
-        rule.scenario.use { scenario ->
-            scenario.onActivity { activity ->
-                activity.onStartDoOnDispose = {
-                    Assert.assertEquals(Lifecycle.State.CREATED, activity.lifecycle.currentState)
-                }
-            }
-        }
-    }
 
-    @Test
-    fun onResume() {
-        rule.scenario.use { scenario ->
-            scenario.onActivity { activity ->
-                activity.onResumeDoOnDispose = {
-                    Assert.assertEquals(Lifecycle.State.STARTED, activity.lifecycle.currentState)
-                }
-            }
-        }
-    }
-
-    @Test
-    fun onPause() {
-        rule.scenario.use { scenario ->
-            scenario.onActivity { activity ->
-                activity.onPauseDoOnDispose = {
-                    Assert.assertEquals(Lifecycle.State.DESTROYED, activity.lifecycle.currentState)
-                }
-            }
-        }
-    }
-
-    @Test
-    fun onStop() {
-        rule.scenario.use { scenario ->
-            scenario.onActivity { activity ->
-                activity.onStopDoOnDispose = {
-                    Assert.assertEquals(Lifecycle.State.DESTROYED, activity.lifecycle.currentState)
-                }
-            }
-        }
-    }
-
-    @Test
-    fun onDestroy() {
-        rule.scenario.use { scenario ->
-            scenario.onActivity { activity ->
-                activity.onDestroyDoOnDispose = {
-                    Assert.assertEquals(Lifecycle.State.DESTROYED, activity.lifecycle.currentState)
-                }
-            }
+    companion object {
+        @Suppress("unused")
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "Strategy: {0}, subscribe: {1}, dispose: {2}")
+        fun parameters(): Iterable<Array<Any>> {
+            val parameters = mutableListOf<Array<Any>>()
+            // OnLifecycle
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, ON_CREATE, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, ON_START, CREATED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, ON_RESUME, STARTED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, ON_PAUSE, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, ON_STOP, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnLifecycle, ON_DESTROY, DESTROYED))
+            // OnPause
+            parameters.add(arrayOf(DisposeStrategy.OnPause, ON_CREATE, STARTED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, ON_START, STARTED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, ON_RESUME, STARTED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, ON_PAUSE, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, ON_STOP, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnPause, ON_DESTROY, DESTROYED))
+            // OnStop
+            parameters.add(arrayOf(DisposeStrategy.OnStop, ON_CREATE, CREATED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, ON_START, CREATED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, ON_RESUME, CREATED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, ON_PAUSE, CREATED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, ON_STOP, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnStop, ON_DESTROY, DESTROYED))
+            // OnDestroy
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, ON_CREATE, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, ON_START, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, ON_RESUME, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, ON_PAUSE, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, ON_STOP, DESTROYED))
+            parameters.add(arrayOf(DisposeStrategy.OnDestroy, ON_DESTROY, DESTROYED))
+            return parameters
         }
     }
 }

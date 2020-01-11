@@ -2,10 +2,10 @@
 
 package com.wada811.lifecycledispose
 
-import androidx.annotation.Keep
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.Event
 import androidx.lifecycle.Lifecycle.Event.ON_DESTROY
 import androidx.lifecycle.Lifecycle.Event.ON_PAUSE
 import androidx.lifecycle.Lifecycle.Event.ON_START
@@ -33,137 +33,99 @@ import io.reactivex.disposables.Disposable
  * | onDestroy | DESTROYED       | onDestroy |
  * ```
  */
-@Keep
-fun <TDisposable : Disposable> TDisposable.disposeOnLifecycle(activity: FragmentActivity): TDisposable =
-    this.also {
-        disposeOnLifecycleEvent(activity, when (activity.lifecycle.currentState) {
-            INITIALIZED -> ON_DESTROY // onCreate
-            CREATED -> ON_STOP // onStart, onStop
-            STARTED, RESUMED -> ON_PAUSE // onResume, onPause
-            DESTROYED -> ON_DESTROY // onDestroy
-        })
-    }
+fun <T : Disposable> T.disposeOnLifecycle(activity: FragmentActivity): T =
+    disposeOnLifecycleEvent(activity, when (activity.lifecycle.currentState) {
+        INITIALIZED -> ON_DESTROY // onCreate
+        CREATED -> ON_STOP // onStart, onStop
+        STARTED, RESUMED -> ON_PAUSE // onResume, onPause
+        DESTROYED -> ON_DESTROY // onDestroy
+    })
 
-@Keep
-fun <TDisposable : Disposable> TDisposable.disposeOnStop(activity: FragmentActivity): TDisposable = disposeOnLifecycleEvent(activity, ON_STOP)
+fun <T : Disposable> T.disposeOnStop(activity: FragmentActivity): T = disposeOnLifecycleEvent(activity, ON_STOP)
+fun <T : Disposable> T.disposeOnPause(activity: FragmentActivity): T = disposeOnLifecycleEvent(activity, ON_PAUSE)
+fun <T : Disposable> T.disposeOnDestroy(activity: FragmentActivity): T = disposeOnLifecycleEvent(activity, ON_DESTROY)
 
-@Keep
-fun <TDisposable : Disposable> TDisposable.disposeOnPause(activity: FragmentActivity): TDisposable = disposeOnLifecycleEvent(activity, ON_PAUSE)
-
-@Keep
-fun <TDisposable : Disposable> TDisposable.disposeOnDestroy(activity: FragmentActivity): TDisposable = disposeOnLifecycleEvent(activity, ON_DESTROY)
-
-
-@Keep
-private fun <TDisposable : Disposable> TDisposable.disposeOnLifecycleEvent(activity: FragmentActivity, lifecycleEvent: Lifecycle.Event): TDisposable =
-    this.also {
-        when (activity.lifecycle.currentState) {
-            DESTROYED -> dispose()
-            else -> disposeOnLifecycleEvents(activity.lifecycle, listOf(lifecycleEvent, ON_DESTROY))
-        }
-    }
+private fun <T : Disposable> T.disposeOnLifecycleEvent(activity: FragmentActivity, lifecycleEvent: Event): T =
+    disposeOnLifecycleEvents(activity.lifecycle, listOf(lifecycleEvent, ON_DESTROY))
 
 /**
  * Dispose on corresponding lifecycle event.
  *
  * ```
- * | Subscribe     | Lifecycle.State | Dispose       |
- * | ------------- | --------------- | ------------- |
- * | onCreate      | INITIALIZED     | onDestroy     |
- * | onCreateView  | INITIALIZED     | onDestroyView |
- * | onStart       | CREATED         | onStop        |
- * | onResume      | STARTED         | onPause       |
- * | onPause       | STARTED         | onDestroyView |
- * | onStop        | CREATED         | onDestroyView |
- * | onDestroyView | DESTROYED       | onDestroyView |
- * | onDestroy     | DESTROYED       | onDestroy     |
+ * | Subscribe     | ViewLifecycle.State   | Dispose       | Lifecycle.State | Dispose       |
+ * | ------------- | --------------------- | ------------- | --------------- | ------------- |
+ * | onAttach      | IllegalStateException | onDestroy     | INITIALIZED     | onDestroy     |
+ * | onCreate      | IllegalStateException | onDestroy     | INITIALIZED     | onDestroy     |
+ * | onCreateView  | IllegalStateException | onDestroyView | CREATED         | onDestroy     |
+ * | onViewCreated | INITIALIZED           | onDestroyView | not called      | not called    |
+ * | onStart       | CREATED               | onStop        | CREATED         | onStop        |
+ * | onResume      | STARTED               | onPause       | STARTED         | onPause       |
+ * | onPause       | STARTED               | onDestroyView | STARTED         | onDestroy     |
+ * | onStop        | CREATED               | onDestroyView | CREATED         | onDestroy     |
+ * | onDestroyView | DESTROYED             | onDestroyView | not called      | not called    |
+ * | onDestroy     | IllegalStateException | onDestroy     | DESTROYED       | onDestroy     |
  * ```
  */
-@Keep
-fun <TDisposable : Disposable> TDisposable.disposeOnLifecycle(fragment: Fragment): TDisposable =
-    this.also {
-        disposeOnLifecycleEvent(fragment)
-    }
+fun <T : Disposable> T.disposeOnLifecycle(fragment: Fragment): T =
+    disposeOnLifecycleEvent(fragment, when (fragment.viewLifecycleOrLifecycle.currentState) {
+        INITIALIZED -> ON_DESTROY // onAttach, onCreate, onViewCreated
+        CREATED -> null // onCreateView: ON_DESTROY, onStart, onStop: ON_STOP
+        STARTED, RESUMED -> ON_PAUSE // onResume, onPause
+        DESTROYED -> ON_DESTROY // onDestroyView, onDestroy
+    })
 
-@Keep
-fun <TDisposable : Disposable> TDisposable.disposeOnStop(fragment: Fragment): TDisposable = disposeOnLifecycleEvent(fragment, ON_STOP)
+fun <T : Disposable> T.disposeOnStop(fragment: Fragment): T = disposeOnLifecycleEvent(fragment, ON_STOP)
+fun <T : Disposable> T.disposeOnPause(fragment: Fragment): T = disposeOnLifecycleEvent(fragment, ON_PAUSE)
+fun <T : Disposable> T.disposeOnDestroy(fragment: Fragment): T = disposeOnLifecycleEvent(fragment, ON_DESTROY)
 
-@Keep
-fun <TDisposable : Disposable> TDisposable.disposeOnPause(fragment: Fragment): TDisposable = disposeOnLifecycleEvent(fragment, ON_PAUSE)
-
-@Keep
-fun <TDisposable : Disposable> TDisposable.disposeOnDestroy(fragment: Fragment): TDisposable = disposeOnLifecycleEvent(fragment, ON_DESTROY)
-
-private fun <TDisposable : Disposable> TDisposable.disposeOnLifecycleEvent(fragment: Fragment, lifecycleEvent: Lifecycle.Event? = null): TDisposable =
-    this.also {
-        if (fragment.view != null) {
-            val lifecycle = fragment.viewLifecycleOwner.lifecycle
-            when (lifecycle.currentState) {
-                // Called from onViewCreated, onActivityCreated, onViewStateRestored
-                INITIALIZED -> disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_DESTROY))
-                // Called from onStart, onStop
-                CREATED -> disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_STOP, ON_DESTROY))
-                // Called from onResume, onPause
-                STARTED, RESUMED -> disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_PAUSE, ON_DESTROY))
-                // Called from onDestroyView
-                else -> safeDispose()
+private fun <T : Disposable> T.disposeOnLifecycleEvent(fragment: Fragment, lifecycleEvent: Event?): T =
+    if (fragment.viewLifecycleOwnerLiveData.value != null) {
+        val lifecycle = fragment.viewLifecycleOwner.lifecycle
+        // 1: In onStart, Fragment has view.
+        disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent ?: /* 1 */ON_STOP, ON_DESTROY))
+    } else {
+        val lifecycle = fragment.lifecycle
+        when (lifecycle.currentState) {
+            INITIALIZED -> disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_DESTROY))
+            CREATED -> doOnLifecycleEvents(lifecycle, listOf(ON_START, ON_DESTROY)) {
+                if (fragment.viewLifecycleOwnerLiveData.value != null) {
+                    // 2: In onCreateView, Fragment has view.
+                    //  2-1: If disposeOnPause/disposeOnStop/disposeOnDestroy called, dispose in lifecycleEvent
+                    //  2-2: If disposeOnLifecycle called, dispose in onDestroyView
+                    disposeOnLifecycleEvents(fragment.viewLifecycleOwner.lifecycle, listOfNotNull(/* 2-1 */lifecycleEvent, /* 2-2 */ON_DESTROY))
+                } else {
+                    // 3: In onStart, Fragment has no view.
+                    //  3-1: If disposeOnPause/disposeOnStop/disposeOnDestroy called, dispose in lifecycleEvent
+                    //  3-2: If disposeOnLifecycle called, dispose in onStop
+                    // 4: In onStop, Fragment has no view.
+                    //       If disposeOnPause/disposeOnStop/disposeOnDestroy called, dispose in onDestroy
+                    //       If disposeOnLifecycle called, dispose in onDestroy
+                    disposeOnLifecycleEvents(lifecycle, listOfNotNull(/* 3-1 */lifecycleEvent ?: /* 3-2 */ON_STOP, /* 4 */ON_DESTROY))
+                }
             }
-        } else {
-            val lifecycle = fragment.lifecycle
-            when (lifecycle.currentState) {
-                INITIALIZED -> doOnLifecycleEvents(lifecycle, {
-                    // Called from onAttach, onCreate
-                    if (fragment.view != null) {
-                        disposeOnLifecycleEvents(fragment.viewLifecycleOwner.lifecycle, listOfNotNull(lifecycleEvent, ON_DESTROY))
-                    } else {
-                        disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_DESTROY))
-                    }
-                }, listOf(ON_START))
-                CREATED -> doOnLifecycleEvents(lifecycle, { event ->
-                    // Evaluate which Fragment has view after onCreateView.
-                    if (event == ON_START) {
-                        if (fragment.view != null) {
-                            // Called from onCreateView
-                            disposeOnLifecycleEvents(fragment.viewLifecycleOwner.lifecycle, listOfNotNull(lifecycleEvent, ON_DESTROY))
-                        } else {
-                            // Called from onActivityCreated, onStart
-                            disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_STOP, ON_DESTROY))
-                        }
-                    } else if (event == ON_DESTROY) {
-                        // Called from onStop
-                        safeDispose()
-                    }
-                }, listOf(ON_START, ON_DESTROY))
-                // Called from onResume, onPause
-                STARTED, RESUMED -> disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_PAUSE, ON_DESTROY))
-                // Called from onDestroy
-                else -> safeDispose()
-            }
+            else -> disposeOnLifecycleEvents(lifecycle, listOfNotNull(lifecycleEvent, ON_DESTROY))
         }
     }
 
-private fun Disposable.disposeOnLifecycleEvents(lifecycle: Lifecycle, lifecycleEvents: List<Lifecycle.Event>) {
-    doOnLifecycleEvents(lifecycle, { safeDispose() }, lifecycleEvents)
-}
+private val Fragment.viewLifecycleOrLifecycle: Lifecycle
+    get() = if (viewLifecycleOwnerLiveData.value != null) viewLifecycleOwner.lifecycle else lifecycle
 
-private fun Disposable.doOnLifecycleEvents(
-    lifecycle: Lifecycle,
-    onEvent: Disposable.(Lifecycle.Event) -> Unit,
-    lifecycleEvents: List<Lifecycle.Event>
-) {
+private fun <T : Disposable> T.disposeOnLifecycleEvents(lifecycle: Lifecycle, lifecycleEvents: List<Event>): T =
+    if (lifecycle.currentState == DESTROYED) safeDispose() else doOnLifecycleEvents(lifecycle, lifecycleEvents) { safeDispose() }
+
+private fun <T : Disposable> T.doOnLifecycleEvents(lifecycle: Lifecycle, lifecycleEvents: List<Event>, onEvent: T.() -> Unit): T = this.also {
     lifecycle.addObserver(object : LifecycleEventObserver {
-        override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        override fun onStateChanged(source: LifecycleOwner, event: Event) {
             if (event in lifecycleEvents) {
                 lifecycle.removeObserver(this)
-                onEvent(event)
+                onEvent()
             }
         }
     })
 }
 
-private fun Disposable.safeDispose() {
+private fun <T : Disposable> T.safeDispose(): T = this.also {
     if (!isDisposed) {
         dispose()
     }
 }
-
