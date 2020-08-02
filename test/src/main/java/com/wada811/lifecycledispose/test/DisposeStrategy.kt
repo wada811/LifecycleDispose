@@ -6,7 +6,7 @@ import com.wada811.lifecycledispose.disposeOnDestroy
 import com.wada811.lifecycledispose.disposeOnLifecycle
 import com.wada811.lifecycledispose.disposeOnPause
 import com.wada811.lifecycledispose.disposeOnStop
-import io.reactivex.disposables.Disposable
+import io.reactivex.rxjava3.disposables.Disposable
 
 enum class DisposeStrategy {
     OnLifecycle {

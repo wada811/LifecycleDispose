@@ -12,6 +12,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
     testOptions {
         unitTests.includeAndroidResources = true
     }
@@ -25,10 +28,10 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation project(":LifecycleDispose")
 //    implementation 'com.github.wada811:LifecycleDispose:2.0.3'
-    implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
-    implementation "io.reactivex.rxjava2:rxjava:2.2.14"
-    implementation "androidx.fragment:fragment:1.2.0-rc04"
-    implementation 'androidx.fragment:fragment-testing:1.2.0-rc04'
+    implementation "io.reactivex.rxjava3:rxkotlin:3.0.0"
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.5'
+    implementation "androidx.fragment:fragment:1.2.5"
+    debugImplementation 'androidx.fragment:fragment-testing:1.2.5'
 
     testImplementation 'junit:junit:4.12'
 
@@ -45,5 +48,5 @@ dependencies {
     testImplementation 'androidx.test.ext:junit:1.1.1'
     testImplementation 'androidx.test.ext:junit-ktx:1.1.1'
     testImplementation 'androidx.test.ext:truth:1.2.0'
-    testImplementation 'com.google.truth:truth:1.0'
+    testImplementation 'com.google.truth:truth:1.0.1'
 }
