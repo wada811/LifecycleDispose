@@ -1,0 +1,36 @@
+plugins {
+    id 'com.android.library'
+    id 'com.diffplug.spotless'
+    id 'org.jetbrains.kotlin.android'
+}
+
+ext {
+    PUBLISH_GROUP_ID = 'com.wada811.lifecycledispose'
+    PUBLISH_ARTIFACT_ID = 'lifecycledispose2'
+    PUBLISH_VERSION = '4.0.0'
+}
+
+apply from: "${rootDir}/publish-module.gradle"
+
+android {
+    namespace "com.wada811.lifecycledispose"
+    compileSdkVersion 33
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 33
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.0"
+    implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
+    implementation "androidx.fragment:fragment:1.5.5"
+}

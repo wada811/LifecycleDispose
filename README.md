@@ -49,7 +49,7 @@ Observable.interval(1, TimeUnit.SECONDS)
 **Table 1** Corresponding between Activity's lifecycle state and Lifecycle down event.
 
 | Subscribe | Lifecycle.State | Lifecycle.Event | Dispose   |
-| --------- | --------------- | --------------- | --------- |
+|-----------|-----------------|-----------------|-----------|
 | onCreate  | INITIALIZED     | ON_DESTROY      | onDestroy |
 | onStart   | CREATED         | ON_STOP         | onStop    |
 | onResume  | STARTED         | ON_PAUSE        | onPause   |
@@ -62,30 +62,46 @@ Observable.interval(1, TimeUnit.SECONDS)
 
 **Table 2** Corresponding between Fragment's lifecycle state and Lifecycle down event.
 
- | Subscribe     | ViewLifecycle.State   | Dispose       | Lifecycle.State | Dispose       |
- | ------------- | --------------------- | ------------- | --------------- | ------------- |
- | onAttach      | IllegalStateException | onDestroy     | INITIALIZED     | onDestroy     |
- | onCreate      | IllegalStateException | onDestroy     | INITIALIZED     | onDestroy     |
- | onCreateView  | IllegalStateException | onDestroyView | CREATED         | onDestroy     |
- | onViewCreated | INITIALIZED           | onDestroyView | not called      | not called    |
- | onStart       | CREATED               | onStop        | CREATED         | onStop        |
- | onResume      | STARTED               | onPause       | STARTED         | onPause       |
- | onPause       | STARTED               | onDestroyView | STARTED         | onDestroy     |
- | onStop        | CREATED               | onDestroyView | CREATED         | onDestroy     |
- | onDestroyView | DESTROYED             | onDestroyView | not called      | not called    |
- | onDestroy     | IllegalStateException | onDestroy     | DESTROYED       | onDestroy     |
+| Subscribe     | ViewLifecycle.State   | Dispose       | Lifecycle.State | Dispose    |
+|---------------|-----------------------|---------------|-----------------|------------|
+| onAttach      | IllegalStateException | onDestroy     | INITIALIZED     | onDestroy  |
+| onCreate      | IllegalStateException | onDestroy     | INITIALIZED     | onDestroy  |
+| onCreateView  | IllegalStateException | onDestroyView | CREATED         | onDestroy  |
+| onViewCreated | INITIALIZED           | onDestroyView | not called      | not called |
+| onStart       | CREATED               | onStop        | CREATED         | onStop     |
+| onResume      | STARTED               | onPause       | STARTED         | onPause    |
+| onPause       | STARTED               | onDestroyView | STARTED         | onDestroy  |
+| onStop        | CREATED               | onDestroyView | CREATED         | onDestroy  |
+| onDestroyView | DESTROYED             | onDestroyView | not called      | not called |
+| onDestroy     | IllegalStateException | onDestroy     | DESTROYED       | onDestroy  |
 
 ## Gradle
 
-[![](https://jitpack.io/v/wada811/LifecycleDispose.svg)](https://jitpack.io/#wada811/LifecycleDispose)
+### LifecycleDispose2
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.wada811.lifecycledispose/lifecycledispose2/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.wada811.lifecycledispose/lifecycledispose2)
 
 ```groovy
 repositories {
-    maven { url "https://www.jitpack.io" }
+    mavenCentral()
 }
 
 dependencies {
-    implementation 'com.github.wada811:LifecycleDispose:x.y.z'
+    implementation 'com.wada811.lifecycledispose:lifecycledispose2:x.y.z'
+}
+```
+
+### LifecycleDispose3
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.wada811.lifecycledispose/lifecycledispose3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.wada811.lifecycledispose/lifecycledispose3)
+
+```groovy
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.wada811.lifecycledispose:lifecycledispose3:x.y.z'
 }
 ```
 

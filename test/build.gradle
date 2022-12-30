@@ -2,51 +2,46 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 29
+    namespace "com.wada811.lifecycledispose.test"
+    compileSdkVersion 33
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 33
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
     testOptions {
         unitTests.includeAndroidResources = true
     }
 }
 
-repositories {
-    maven { url "https://www.jitpack.io" }
-}
-
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation project(":LifecycleDispose")
-//    implementation 'com.github.wada811:LifecycleDispose:2.0.3'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.0"
+    implementation project(":LifecycleDispose3")
     implementation "io.reactivex.rxjava3:rxkotlin:3.0.0"
     implementation 'io.reactivex.rxjava3:rxjava:3.0.5'
-    implementation "androidx.fragment:fragment:1.2.5"
-    debugImplementation 'androidx.fragment:fragment-testing:1.2.5'
+    implementation "androidx.fragment:fragment-ktx:1.5.5"
+    debugImplementation 'androidx.fragment:fragment-testing:1.5.5'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
 
     // Core library
-    testImplementation 'androidx.test:core:1.2.0'
-    testImplementation 'androidx.test:core-ktx:1.2.0'
+    testImplementation 'androidx.test:core-ktx:1.5.0'
 
     // AndroidJUnitRunner, JUnit Rules and RobolectricRunner
-    testImplementation 'androidx.test:runner:1.2.0'
-    testImplementation 'androidx.test:rules:1.2.0'
-    testImplementation 'org.robolectric:robolectric:4.3.1'
+    testImplementation 'androidx.test:runner:1.5.1'
+    testImplementation 'androidx.test:rules:1.5.0'
+    testImplementation 'org.robolectric:robolectric:4.9'
 
     // Assertions
-    testImplementation 'androidx.test.ext:junit:1.1.1'
-    testImplementation 'androidx.test.ext:junit-ktx:1.1.1'
-    testImplementation 'androidx.test.ext:truth:1.2.0'
-    testImplementation 'com.google.truth:truth:1.0.1'
+    testImplementation 'androidx.test.ext:junit:1.1.4'
+    testImplementation 'androidx.test.ext:junit-ktx:1.1.4'
+    testImplementation 'androidx.test.ext:truth:1.5.0'
+    testImplementation 'com.google.truth:truth:1.1.3'
 }

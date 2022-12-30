@@ -1,1 +1,18 @@
-include ':LifecycleDispose', ':test'
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "LifecycleDispose"
+include ':LifecycleDispose2'
+include ':LifecycleDispose3'
+include ':test'
