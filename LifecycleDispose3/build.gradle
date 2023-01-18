@@ -31,6 +31,6 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.0"
     implementation "io.reactivex.rxjava3:rxkotlin:3.0.1"
-    implementation 'io.reactivex.rxjava3:rxjava:3.1.5'
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
     implementation "androidx.fragment:fragment:1.5.5"
 }
