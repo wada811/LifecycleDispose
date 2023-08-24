@@ -32,5 +32,5 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.21"
     implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
     implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
-    implementation "androidx.fragment:fragment:1.5.7"
+    implementation "androidx.fragment:fragment:1.6.1"
 }
